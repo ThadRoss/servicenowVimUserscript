@@ -1,0 +1,28 @@
+// ==UserScript==
+// @name        SNOW CodeMirror Vim activator & embiggener
+// @description Enables vim mode for ServiceNow in most script editor fields. Also englarges the field!
+// @namespace   https://gist.githubusercontent.com/chaorace/dc49a18f876a9814c8b27d637bfb4f44/raw/sn-vimify.user.js
+// @updateURL   https://gist.githubusercontent.com/chaorace/dc49a18f876a9814c8b27d637bfb4f44/raw/sn-vimify.user.js
+// @supportURL  https://gist.github.com/chaorace/dc49a18f876a9814c8b27d637bfb4f44
+// @include     http://*.service-now.com/*
+// @include     https://*.service-now.com/*
+// @require     https://codemirror.net/keymap/vim.js
+// @run-at      document-idle
+// ==/UserScript==
+(function() {
+    // NOTE: This userscript will throw harmless errors if a given frame doesn't have a CodeMirror editor
+    // This is something that happens during the loading phase for @require, so we can't suppress it
+    if (typeof g_glideEditorArray !== 'undefined' && Array.isArray(g_glideEditorArray)){
+        // Apply the below modifications to each major CodeMirror editor
+        g_glideEditorArray.forEach((cm) => {
+            // Drop the escape keybind that advances to the next field (obviously, we need escape for vim mode!)
+            cm.editor.state.keyMaps = cm.editor.state.keyMaps.filter((x) => !x.Esc)
+            // Actually set the keymap to the one previously loaded from our @require
+            cm.editor.options.keyMap = 'vim'
+            // An infinite viewport margin lets the editor grow with content
+            cm.editor.options.viewportMargin = Infinity
+            // Set the max height to 2/3rds of a screen height
+            cm.editor.getScrollerElement().style.maxHeight = '66vh'
+        })
+    }
+})()
